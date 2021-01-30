@@ -6,8 +6,20 @@ Content-Type: application/json
 Authorization: {{token}}
 
 {
-  "item_id": 3,
+  "item_id": 1,
   "start_time": "2021-01-30T14:00:00Z",
   "end_time": "2021-02-02T14:00:00Z",
   "start_price": 124.55
 }
+
+
+###################FETCH ALL AUCTIONS
+GET {{host}}/auctions
+Content-Type: application/json
+Authorization: {{token}}
+
+
+###################FETCH ALL AUCTIONS FOR AN ITEM###############
+GET {{host}}/auctions?item_id=1
+Content-Type: application/json
+Authorization: {{token}}

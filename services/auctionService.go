@@ -7,4 +7,5 @@ import (
 
 type AuctionService interface {
 	CreateAuction(ctx context.Context, auction *models.Auction) error
+	GetAuctionsByItemID(ctx context.Context, itemID uint) ([]models.Auction, error)
 }

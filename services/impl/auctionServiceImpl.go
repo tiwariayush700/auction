@@ -11,6 +11,14 @@ type auctionServiceImpl struct {
 	repository repository.AuctionRepository
 }
 
+func (a *auctionServiceImpl) GetAuctionsByItemID(ctx context.Context, itemID uint) ([]models.Auction, error) {
+	if itemID > 0 {
+		return a.repository.GetAuctionsByItemID(ctx, itemID)
+	}
+
+	return a.repository.FetchAuctions(ctx)
+}
+
 func (a *auctionServiceImpl) CreateAuction(ctx context.Context, auction *models.Auction) error {
 	return a.repository.Create(ctx, auction)
 }

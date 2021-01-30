@@ -7,6 +7,7 @@ import (
 	"github.com/tiwariayush700/auction/models"
 	"github.com/tiwariayush700/auction/services"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -32,6 +33,36 @@ func (controller *auctionController) RegisterRoutes() {
 
 func (controller *auctionController) GetAuctions() gin.HandlerFunc {
 	return func(c *gin.Context) {
+
+		_, _, err := getUserIdAndRoleFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, err)
+			return
+		}
+
+		itemIDParam := c.Request.FormValue("item_id")
+		itemID := uint64(0)
+		if len(itemIDParam) > 0 {
+			itemID, err = strconv.ParseUint(itemIDParam, 10, 32)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, auctionError.NewErrorBadRequest(err, "invalid item id query param"))
+				return
+			}
+		}
+
+		auctions, err := controller.service.GetAuctionsByItemID(c, uint(itemID))
+		if err != nil {
+			if err == auctionError.ErrorNotFound {
+				errRes := auctionError.NewErrorNotFound(err, "items not found")
+				c.JSON(http.StatusNotFound, errRes)
+				return
+			}
+			errRes := auctionError.NewErrorInternal(err, "something went wrong")
+			c.JSON(http.StatusNotFound, errRes)
+			return
+		}
+
+		c.JSON(http.StatusOK, auctions)
 
 	}
 }
