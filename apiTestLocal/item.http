@@ -1,0 +1,21 @@
+######REGISTER ADMIN USER#########
+POST {{host}}/items
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "name": "wc stumps",
+  "status": "unBiddable"
+}
+
+
+######LIST ALL ITEMS#########
+GET {{host}}/items
+Content-Type: application/json
+Authorization: {{token}}
+
+
+######LIST ITEMS BASED ON STATUS#########
+GET {{host}}/items?status=biddable
+Content-Type: application/json
+Authorization: {{token}}
