@@ -2,7 +2,7 @@ package repositoryImpl
 
 import (
 	"context"
-	userError "github.com/tiwariayush700/auction/error"
+	auctionError "github.com/tiwariayush700/auction/error"
 	"github.com/tiwariayush700/auction/repository"
 	"gorm.io/gorm"
 )
@@ -14,7 +14,7 @@ type repositoryImpl struct {
 func (r *repositoryImpl) Create(ctx context.Context, out interface{}) error {
 	err := r.DB.Create(out).Error
 	if err == gorm.ErrRecordNotFound {
-		return userError.ErrorNotFound
+		return auctionError.ErrorNotFound
 	}
 
 	return err
@@ -23,7 +23,7 @@ func (r *repositoryImpl) Create(ctx context.Context, out interface{}) error {
 func (r *repositoryImpl) Get(ctx context.Context, out interface{}, id interface{}) error {
 	err := r.DB.First(out, "id = ?", id).Error
 	if err == gorm.ErrRecordNotFound {
-		return userError.ErrorNotFound
+		return auctionError.ErrorNotFound
 	}
 
 	return err

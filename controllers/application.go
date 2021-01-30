@@ -46,7 +46,7 @@ func (app *app) Start() {
 
 	//controllers
 	itemController := NewItemController(itemService, app, authService)
-	auctionController := NewAuctionController(auctionService, app, authService)
+	auctionController := NewAuctionController(auctionService, itemService, app, authService)
 
 	//register routes
 	itemController.RegisterRoutes()

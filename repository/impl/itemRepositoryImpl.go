@@ -2,7 +2,7 @@ package repositoryImpl
 
 import (
 	"context"
-	userError "github.com/tiwariayush700/auction/error"
+	auctionError "github.com/tiwariayush700/auction/error"
 	"github.com/tiwariayush700/auction/models"
 	"github.com/tiwariayush700/auction/repository"
 	"gorm.io/gorm"
@@ -18,7 +18,7 @@ func (i *itemRepositoryImpl) GetItemsByStatus(ctx context.Context, status models
 	err := i.DB.Where("status = ?", string(status)).Find(&items).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, userError.ErrorNotFound
+			return nil, auctionError.ErrorNotFound
 		}
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (i *itemRepositoryImpl) FetchItems(ctx context.Context) ([]models.Item, err
 	err := i.DB.Find(&items).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, userError.ErrorNotFound
+			return nil, auctionError.ErrorNotFound
 		}
 		return nil, err
 	}

@@ -1,4 +1,5 @@
-######REGISTER ADMIN USER#########
+######CREATE ITEMS#########
+#######ONLY FOR ADMINS###########
 POST {{host}}/items
 Content-Type: application/json
 Authorization: {{token}}

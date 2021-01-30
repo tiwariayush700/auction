@@ -16,3 +16,10 @@ type Auction struct {
 
 	Item *Item `json:"-"`
 }
+
+type AuctionRequest struct {
+	ItemID     uint    `json:"item_id" binding:"required"`
+	StartTime  string  `json:"start_time" binding:"required"`
+	EndTime    string  `json:"end_time" binding:"required"`
+	StartPrice float64 `json:"start_price" binding:"required"`
+}

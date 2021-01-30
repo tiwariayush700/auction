@@ -4,7 +4,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
 	"github.com/tiwariayush700/auction/auth"
-	userError "github.com/tiwariayush700/auction/error"
+	auctionError "github.com/tiwariayush700/auction/error"
 	"github.com/tiwariayush700/auction/models"
 )
 
@@ -35,7 +35,7 @@ func (impl *authImpl) GenerateUserToken(userID uint, role string) (string, error
 func (impl *authImpl) AuthenticateUser(jwtTokenString string) (*models.UserLoginJWTClaims, error) {
 
 	if len(jwtTokenString) == 0 {
-		return nil, userError.ErrorTokenExpected
+		return nil, auctionError.ErrorTokenExpected
 	}
 
 	claims := jwt.MapClaims{}
@@ -44,14 +44,14 @@ func (impl *authImpl) AuthenticateUser(jwtTokenString string) (*models.UserLogin
 	})
 
 	if token != nil && !token.Valid {
-		return nil, userError.ErrorTokenInvalid
+		return nil, auctionError.ErrorTokenInvalid
 	}
 
 	userLoginJWTClaims := &models.UserLoginJWTClaims{}
 	err = auth.GetDataFromTokenClaims(claims, &userLoginJWTClaims)
 	if err != nil {
 		logrus.Errorf("err decoding payload err: %v", err)
-		return nil, userError.ErrorTokenExpected
+		return nil, auctionError.ErrorTokenExpected
 	}
 
 	return userLoginJWTClaims, nil

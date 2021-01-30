@@ -1,4 +1,4 @@
-package userError
+package auctionError
 
 type ErrorCode string
 

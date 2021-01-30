@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/tiwariayush700/auction/auth"
-	userError "github.com/tiwariayush700/auction/error"
+	auctionError "github.com/tiwariayush700/auction/error"
 	"github.com/tiwariayush700/auction/models"
 	"github.com/tiwariayush700/auction/services"
 	"net/http"
@@ -40,14 +40,14 @@ func (controller *itemController) CreateItem() gin.HandlerFunc {
 		item := &models.Item{}
 		err = c.ShouldBind(item)
 		if err != nil {
-			errRes := userError.NewErrorBadRequest(err, "invalid input")
+			errRes := auctionError.NewErrorBadRequest(err, "invalid input")
 			c.JSON(http.StatusBadRequest, errRes)
 			return
 		}
 
 		err = controller.service.CreateItem(c, item)
 		if err != nil {
-			errRes := userError.NewErrorInternal(err, "something went wrong")
+			errRes := auctionError.NewErrorInternal(err, "something went wrong")
 			c.JSON(http.StatusInternalServerError, errRes)
 			return
 		}
@@ -69,12 +69,12 @@ func (controller *itemController) GetItems() gin.HandlerFunc {
 
 		items, err := controller.service.GetItemsForStatus(c, models.ItemStatus(status))
 		if err != nil {
-			if err == userError.ErrorNotFound {
-				errRes := userError.NewErrorNotFound(err, "items not found")
+			if err == auctionError.ErrorNotFound {
+				errRes := auctionError.NewErrorNotFound(err, "items not found")
 				c.JSON(http.StatusNotFound, errRes)
 				return
 			}
-			errRes := userError.NewErrorInternal(err, "something went wrong")
+			errRes := auctionError.NewErrorInternal(err, "something went wrong")
 			c.JSON(http.StatusNotFound, errRes)
 			return
 		}
