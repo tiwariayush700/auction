@@ -20,13 +20,13 @@ type auctionController struct {
 
 func (controller *auctionController) RegisterRoutes() {
 	router := controller.app.Router
-	itemRouterGroup := router.Group("/auctions")
+	auctionRouterGroup := router.Group("/auctions")
 	{
-		itemRouterGroup.Use(VerifyUserAndServe(controller.authService))
-		itemRouterGroup.GET("", controller.GetAuctions())
+		auctionRouterGroup.Use(VerifyUserAndServe(controller.authService))
+		auctionRouterGroup.GET("", controller.GetAuctions())
 
-		itemRouterGroup.Use(VerifyAdminAndServe(controller.authService))
-		itemRouterGroup.POST("", controller.CreateAuction())
+		auctionRouterGroup.Use(VerifyAdminAndServe(controller.authService))
+		auctionRouterGroup.POST("", controller.CreateAuction())
 
 	}
 }

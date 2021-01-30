@@ -8,6 +8,7 @@ import (
 	"github.com/tiwariayush700/auction/models"
 	"github.com/tiwariayush700/auction/services"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -20,20 +21,117 @@ type bidController struct {
 
 func (controller *bidController) RegisterRoutes() {
 	router := controller.app.Router
-	itemRouterGroup := router.Group("/bids")
+	bidRouterGroup := router.Group("/bids")
 	{
-		itemRouterGroup.Use(VerifyUserAndServe(controller.authService))
-		itemRouterGroup.GET("", controller.GetBids())
+		bidRouterGroup.Use(VerifyUserAndServe(controller.authService))
+		bidRouterGroup.POST("", controller.CreateBid())
+		bidRouterGroup.GET("/:bid_id", controller.GetBidResult())
 
-		//itemRouterGroup.Use(VerifyAdminAndServe(controller.authService))
-		itemRouterGroup.POST("", controller.CreateBid())
+		bidRouterGroup.Use(VerifyAdminAndServe(controller.authService))
+		bidRouterGroup.GET("", controller.GetBids())
 
+	}
+}
+
+func (controller *bidController) GetBidResult() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		_, _, err := getUserIdAndRoleFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, err)
+			return
+		}
+
+		bidIdParam, ok := c.Params.Get("bid_id")
+		if !ok {
+			c.JSON(http.StatusBadRequest, auctionError.NewErrorBadRequest(err, "Invalid Bid ID"))
+			return
+		}
+
+		bidId, err := strconv.ParseUint(bidIdParam, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, auctionError.NewErrorBadRequest(err, "err parsing Bid ID"))
+			return
+		}
+
+		bid, err := controller.service.GetBidByID(c, uint(bidId))
+		if err != nil {
+			if err == auctionError.ErrorNotFound {
+				c.JSON(http.StatusNotFound, auctionError.NewErrorNotFound(err, "No bid found for the given bid id"))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, auctionError.NewErrorInternal(err, "something went wrong"))
+			return
+		}
+
+		auction, err := controller.auctionService.GetAuctionByID(c, bid.AuctionID)
+		if err != nil {
+			if err == auctionError.ErrorNotFound {
+				c.JSON(http.StatusNotFound, auctionError.NewErrorNotFound(err, "No auction found for the given auction id"))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, auctionError.NewErrorInternal(err, "something went wrong"))
+			return
+		}
+
+		bids, err := controller.service.GetBidsByAuctionID(c, bid.AuctionID)
+		if err != nil {
+			if err == auctionError.ErrorNotFound {
+				c.JSON(http.StatusNotFound, auctionError.NewErrorNotFound(err, "No bid found for the given auction id"))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, auctionError.NewErrorInternal(err, "something went wrong"))
+			return
+		}
+
+		maximumBid := float64(0)
+		userID := uint(0)
+		for _, val := range bids {
+			if val.Amount > maximumBid {
+				maximumBid = val.Amount
+				userID = val.UserID
+			}
+		}
+
+		timeNow := time.Now()
+		if timeNow.Before(auction.StartTime) {
+			c.JSON(http.StatusBadRequest, auctionError.NewErrorBadRequest(auctionError.ErrorBadRequest,
+				fmt.Sprintf("Auction has not started yet. It will start at %v", auction.StartTime)))
+			return
+		}
+
+		if timeNow.After(auction.EndTime) {
+			//TODO update item status to unbiddable or sold
+			c.JSON(http.StatusOK, gin.H{
+				"message": fmt.Sprintf("Auction is complete. Max Bid amount was %0.2f against user with userID : %v", maximumBid, userID),
+				"data":    bid,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": fmt.Sprintf("Auction is ongoing. Current max bid is %0.2f by user with userID : %v", maximumBid, userID),
+			"data":    bid,
+		})
 	}
 }
 
 func (controller *bidController) GetBids() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
+		_, _, err := getUserIdAndRoleFromContext(c)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, err)
+			return
+		}
+
+		bids, err := controller.service.FetchBids(c)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, auctionError.NewErrorInternal(err, "something went wrong"))
+			return
+		}
+
+		c.JSON(http.StatusOK, bids)
 	}
 }
 

@@ -7,3 +7,15 @@ Authorization: {{token}}
   "auction_id": 6,
   "amount": 131
 }
+
+##################LISTS ALL BIDS###############
+##########ONLY ADMIN CAN ACCESS###############
+GET {{host}}/bids
+Content-Type: application/json
+Authorization: {{token}}
+
+
+####################GET BID STATUS
+GET {{host}}/bids/5
+Content-Type: application/json
+Authorization: {{token}}
