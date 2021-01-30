@@ -37,16 +37,20 @@ func (app *app) Start() {
 
 	//repositories
 	itemRepository := repositoryImpl.NewItemRepositoryImpl(app.DB)
+	auctionRepository := repositoryImpl.NewAuctionRepositoryImpl(app.DB)
 
 	//services
 	authService := authImpl.NewAuthService(app.Config.AuthSecret)
 	itemService := serviceImpl.NewItemServiceImpl(itemRepository)
+	auctionService := serviceImpl.NewAuctionServiceImpl(auctionRepository)
 
 	//controllers
 	itemController := NewItemController(itemService, app, authService)
+	auctionController := NewAuctionController(auctionService, app, authService)
 
 	//register routes
 	itemController.RegisterRoutes()
+	auctionController.RegisterRoutes()
 
 	app.Router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
