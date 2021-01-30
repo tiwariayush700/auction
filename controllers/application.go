@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	authImpl "github.com/tiwariayush700/auction/auth/impl"
 	"github.com/tiwariayush700/auction/config"
+	"github.com/tiwariayush700/auction/models"
 	"gorm.io/gorm"
 )
 
@@ -53,6 +54,21 @@ func (app *app) Start() {
 }
 
 func (app *app) Migrate() error {
+	if err := app.DB.AutoMigrate(&models.User{}); err != nil {
+		return err
+	}
+
+	if err := app.DB.AutoMigrate(&models.Item{}); err != nil {
+		return err
+	}
+
+	if err := app.DB.AutoMigrate(&models.Auction{}); err != nil {
+		return err
+	}
+
+	if err := app.DB.AutoMigrate(&models.Bid{}); err != nil {
+		return err
+	}
 
 	return nil
 }
