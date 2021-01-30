@@ -1,0 +1,9 @@
+##########CREATES BIDS#########
+POST {{host}}/bids
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+  "auction_id": 6,
+  "amount": 131
+}

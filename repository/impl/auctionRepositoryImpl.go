@@ -12,6 +12,21 @@ type auctionRepositoryImpl struct {
 	repositoryImpl
 }
 
+func (a *auctionRepositoryImpl) UpdateAuctionPrice(ctx context.Context, amount float64, auctionID uint) error {
+
+	err := a.DB.Model(&models.Auction{}).
+		Where("id = ?", auctionID).
+		Update("start_price", amount).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return auctionError.ErrorNotFound
+		}
+		return err
+	}
+
+	return nil
+}
+
 func (a *auctionRepositoryImpl) FetchAuctions(ctx context.Context) ([]models.Auction, error) {
 	auctions := make([]models.Auction, 0)
 

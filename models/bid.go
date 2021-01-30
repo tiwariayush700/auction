@@ -13,3 +13,8 @@ type Bid struct {
 	User    *User    `json:"-"`
 	Auction *Auction `json:"-"`
 }
+
+type BidRequest struct {
+	AuctionID uint    `json:"auction_id" binding:"required"`
+	Amount    float64 `json:"amount" binding:"required"`
+}
