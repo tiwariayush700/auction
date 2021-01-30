@@ -7,6 +7,8 @@ import (
 	authImpl "github.com/tiwariayush700/auction/auth/impl"
 	"github.com/tiwariayush700/auction/config"
 	"github.com/tiwariayush700/auction/models"
+	repositoryImpl "github.com/tiwariayush700/auction/repository/impl"
+	serviceImpl "github.com/tiwariayush700/auction/services/impl"
 	"gorm.io/gorm"
 )
 
@@ -34,13 +36,17 @@ func (app *app) Start() {
 	}))
 
 	//repositories
+	itemRepository := repositoryImpl.NewItemRepositoryImpl(app.DB)
 
 	//services
-	_ = authImpl.NewAuthService(app.Config.AuthSecret)
+	authService := authImpl.NewAuthService(app.Config.AuthSecret)
+	itemService := serviceImpl.NewItemServiceImpl(itemRepository)
 
 	//controllers
+	itemController := NewItemController(itemService, app, authService)
 
 	//register routes
+	itemController.RegisterRoutes()
 
 	app.Router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
